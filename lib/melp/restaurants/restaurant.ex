@@ -19,6 +19,13 @@ defmodule Melp.Restaurants.Restaurant do
   end
 
   @doc false
+  def changeset_create(restaurant, attrs) do
+    restaurant
+    |> cast(attrs, [:id, :rating, :name, :site, :email, :phone, :street, :city, :state, :lat, :lng])
+    |> validate_required([:rating, :name, :site, :email, :phone, :street, :city, :state, :lat, :lng])
+  end
+
+  @doc false
   def changeset(restaurant, attrs) do
     restaurant
     |> cast(attrs, [:rating, :name, :site, :email, :phone, :street, :city, :state, :lat, :lng])

@@ -5,8 +5,9 @@ defmodule Melp.Restaurants do
 
   import Ecto.Query, warn: false
   alias Melp.Repo
-
   alias Melp.Restaurants.Restaurant
+
+  NimbleCSV.define(MyParser, separator: ",", escape: "\"")
 
   @doc """
   Returns the list of restaurants.
@@ -101,4 +102,28 @@ defmodule Melp.Restaurants do
   def change_restaurant(%Restaurant{} = restaurant, attrs \\ %{}) do
     Restaurant.changeset(restaurant, attrs)
   end
+
+  def read_csv() do
+    __DIR__
+    |> Path.join("restaurantes.csv")
+    |> File.stream!
+    |> MyParser.parse_stream
+    |> Stream.map(fn [id, rating, name, site, email, phone, street, city, state, lat, lng] ->
+      Map.new
+      |> Map.put("id", Ecto.UUID.dump!(id))
+      |> Map.put("rating", rating)
+      |> Map.put("name", name)
+      |> Map.put("site", site)
+      |> Map.put("email", email)
+      |> Map.put("phone", phone)
+      |> Map.put("street", street)
+      |> Map.put("city", city)
+      |> Map.put("state", state)
+      |> Map.put("lat", String.to_float(lat))
+      |> Map.put("lng", String.to_float(lng))
+    end)
+    |> Enum.to_list()
+    |> Enum.map(fn r -> create_restaurant(r) end)
+  end
+
 end
