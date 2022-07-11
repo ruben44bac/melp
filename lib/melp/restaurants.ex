@@ -103,12 +103,22 @@ defmodule Melp.Restaurants do
     Restaurant.changeset(restaurant, attrs)
   end
 
+  def get_restaurants_in_area(lat, lng, radio) do
+    origin = %Geo.Point{coordinates: {lat, lng}, srid: 4326}
+      |> IO.inspect(label: "origin ==>> ")
+    query = from r in Restaurant,
+      where: fragment("ST_DWithin(?::geography, ?::geography, ?)", r.geom, ^origin, ^radio)
+    Repo.all(query)
+  end
+
   def read_csv() do
     __DIR__
     |> Path.join("restaurantes.csv")
     |> File.stream!
     |> MyParser.parse_stream
     |> Stream.map(fn [id, rating, name, site, email, phone, street, city, state, lat, lng] ->
+      lat = String.to_float(lat)
+      lng = String.to_float(lng)
       Map.new
       |> Map.put("id", Ecto.UUID.dump!(id))
       |> Map.put("rating", rating)
@@ -119,8 +129,9 @@ defmodule Melp.Restaurants do
       |> Map.put("street", street)
       |> Map.put("city", city)
       |> Map.put("state", state)
-      |> Map.put("lat", String.to_float(lat))
-      |> Map.put("lng", String.to_float(lng))
+      |> Map.put("lat", lat)
+      |> Map.put("lng", lng)
+      |> Map.put("geom", %Geo.Point{coordinates: {lat, lng}, srid: 4326})
     end)
     |> Enum.to_list()
     |> Enum.map(fn r -> create_restaurant(r) end)
