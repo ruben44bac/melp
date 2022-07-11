@@ -53,4 +53,16 @@ defmodule MelpWeb.RestaurantController do
     end
   end
 
+  def get_restaurants_in_area_statistics(conn, %{"latitud" => lat, "longitud" => lng, "radio" => radio}) do
+    with lat <- Decimal.new(lat),
+      lat <- Decimal.to_float(lat),
+      lng <- Decimal.new(lng),
+      lng <- Decimal.to_float(lng),
+      radio <- Decimal.new(radio),
+      radio <- Decimal.to_float(radio),
+      statistics <- Restaurants.get_restaurants_in_area_statistics(lat, lng, radio) do
+        render(conn, "statistics.json", statistics: statistics)
+    end
+  end
+
 end

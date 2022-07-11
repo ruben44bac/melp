@@ -103,6 +103,15 @@ defmodule Melp.Restaurants do
     Restaurant.changeset(restaurant, attrs)
   end
 
+  def get_restaurants_in_area_statistics(lat, lng, radio) do
+    restaurants = get_restaurants_in_area(lat, lng, radio)
+    avg = get_avg(restaurants)
+    Map.new
+    |> Map.put(:count, get_count(restaurants))
+    |> Map.put(:avg, avg)
+    |> Map.put(:std, get_std(restaurants, avg))
+  end
+
   def get_restaurants_in_area(lat, lng, radio) do
     origin = %Geo.Point{coordinates: {lat, lng}, srid: 4326}
     query = from r in Restaurant,
@@ -134,6 +143,36 @@ defmodule Melp.Restaurants do
     end)
     |> Enum.to_list()
     |> Enum.map(fn r -> create_restaurant(r) end)
+  end
+
+  defp get_count(restaurants) do
+    length(restaurants)
+  end
+
+  defp get_avg(restaurants) do
+    restaurants
+    |> Enum.map(fn r -> r.rating end)
+    |> average
+  end
+
+  defp get_std(restaurants, avg) do
+    restaurants
+    |> Enum.map(fn r ->
+      r
+      |> Map.get(:rating)
+      |> Kernel.-(avg)
+      |> Kernel.abs
+      |> Float.pow(2)
+    end)
+    |> average
+    |> Kernel./(length(restaurants))
+    |> Float.pow(0.5)
+  end
+
+  defp average(list) do
+    list
+    |> Enum.sum
+    |> Kernel./(length(list))
   end
 
 end

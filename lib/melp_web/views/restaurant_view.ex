@@ -26,4 +26,13 @@ defmodule MelpWeb.RestaurantView do
       geom: restaurant.geom
     }
   end
+
+  def render("statistics.json", %{statistics: statistics}) do
+    %{
+      avg: statistics.avg,
+      count: statistics.count,
+      std: statistics.std
+    }
+  end
+
 end

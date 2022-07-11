@@ -28,7 +28,8 @@ defmodule MelpWeb.Router do
 
   scope "/", MelpWeb do
     pipe_through :api
-    get "/restaurantes/estadísticas", RestaurantController, :get_restaurants_in_area
+    get "/restaurantes/estadísticas/todos", RestaurantController, :get_restaurants_in_area
+    get "/restaurantes/estadísticas", RestaurantController, :get_restaurants_in_area_statistics
   end
 
   # Enables LiveDashboard only for development
