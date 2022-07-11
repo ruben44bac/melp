@@ -22,7 +22,8 @@ defmodule MelpWeb.RestaurantView do
       city: restaurant.city,
       state: restaurant.state,
       lat: restaurant.lat,
-      lng: restaurant.lng
+      lng: restaurant.lng,
+      geom: restaurant.geom
     }
   end
 end

@@ -23,8 +23,12 @@ defmodule MelpWeb.Router do
   # Other scopes may use custom stacks.
   scope "/api", MelpWeb do
     pipe_through :api
-
     resources "/restaurants", RestaurantController, except: [:new, :edit]
+  end
+
+  scope "/", MelpWeb do
+    pipe_through :api
+    get "/restaurantes/estadísticas", RestaurantController, :get_restaurants_in_area
   end
 
   # Enables LiveDashboard only for development

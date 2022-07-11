@@ -105,7 +105,6 @@ defmodule Melp.Restaurants do
 
   def get_restaurants_in_area(lat, lng, radio) do
     origin = %Geo.Point{coordinates: {lat, lng}, srid: 4326}
-      |> IO.inspect(label: "origin ==>> ")
     query = from r in Restaurant,
       where: fragment("ST_DWithin(?::geography, ?::geography, ?)", r.geom, ^origin, ^radio)
     Repo.all(query)
