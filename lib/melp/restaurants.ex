@@ -50,6 +50,8 @@ defmodule Melp.Restaurants do
 
   """
   def create_restaurant(attrs \\ %{}) do
+    attrs = attrs
+    |> Map.put("geom", %Geo.Point{coordinates: {attrs["lat"], attrs["lng"]}, srid: 4326})
     %Restaurant{}
     |> Restaurant.changeset(attrs)
     |> Repo.insert()
@@ -68,10 +70,26 @@ defmodule Melp.Restaurants do
 
   """
   def update_restaurant(%Restaurant{} = restaurant, attrs) do
+    attrs = attrs
+      |> update_geom(restaurant)
     restaurant
     |> Restaurant.changeset(attrs)
     |> Repo.update()
   end
+
+  defp update_geom(attrs = %{"lat" => lat, "lng" => lng}, _restaurant), do:
+    attrs
+    |> Map.put("geom", %Geo.Point{coordinates: {lat, lng}, srid: 4326})
+
+  defp update_geom(attrs = %{"lat" => lat}, restaurant), do:
+    attrs
+    |> Map.put("geom", %Geo.Point{coordinates: {lat, restaurant.lng}, srid: 4326})
+
+  defp update_geom(attrs = %{"lng" => lng}, restaurant), do:
+    attrs
+    |> Map.put("geom", %Geo.Point{coordinates: {restaurant.lat, lng}, srid: 4326})
+
+  defp update_geom(attrs, _restaurant), do: attrs
 
   @doc """
   Deletes a restaurant.
