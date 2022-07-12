@@ -2,7 +2,6 @@ defmodule Melp.Restaurants do
   @moduledoc """
   The Restaurants context.
   """
-
   import Ecto.Query, warn: false
   alias Melp.Repo
   alias Melp.Restaurants.Restaurant
